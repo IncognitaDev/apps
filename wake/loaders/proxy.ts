@@ -7,7 +7,6 @@ const PATHS_TO_PROXY = [
   ["/Fechamento/*"],
   ["/Login"],
   ["/login/*"],
-  ["/Login/Authenticate"],
   ["/Carrinho/*"],
   ["/api/*"],
 ];
@@ -34,7 +33,16 @@ function loader(
     },
   }));
 
-  return checkout;
+  return [{
+    pathTemplate: "/sitemap.xml",
+    handler: {
+      value: {
+        __resolveType: "wake/handlers/sitemap.ts",
+      },
+    },
+  }, ...checkout,
+
+  ];
 }
 
 export default loader;
