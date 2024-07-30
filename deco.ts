@@ -10,6 +10,7 @@ const compatibilityApps = [{
 
 const config = {
   apps: [
+    app("cazco"),
     app("smarthint"),
     app("ra-trustvox"),
     app("anthropic"),
