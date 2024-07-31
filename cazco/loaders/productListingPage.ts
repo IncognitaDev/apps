@@ -1,13 +1,13 @@
 import { ProductListingPage } from "../../commerce/types.ts";
 import { AppContext } from "../mod.ts";
 import {
-  getFilterParam,
-  getPaginationInfo,
-  getSortParam,
-  resolvePage,
-  toFilters,
+  // getFilterParam,
+  // getPaginationInfo,
+  // getSortParam,
+  // resolvePage,
+  // toFilters,
   toProduct,
-  toSortOption,
+  // toSortOption,
 } from "../utils/transform.ts";
 import { redirect } from "deco/mod.ts";
 
@@ -48,33 +48,33 @@ const loader = async (
   const products =
     response?.Products?.map((product) => toProduct(product as SHProduct)) ?? [];
 
-  const sortOptions = toSortOption(response?.Sorts ?? []);
+  // const sortOptions = toSortOption(response?.Sorts ?? []);
 
-  const resultFilters = toFilters(response?.Filters ?? [], url);
+  // const resultFilters = toFilters(response?.Filters ?? [], url);
 
-  const { nextPage, previousPage } = getPaginationInfo(
-    url,
-    size,
-    from,
-    page,
-    response?.TotalResult,
-  );
+  // const { nextPage, previousPage } = getPaginationInfo(
+  //   url,
+  //   size,
+  //   from,
+  //   page,
+  //   response?.TotalResult,
+  // );
 
   return {
     "@type": "ProductListingPage",
     products: products,
-    sortOptions,
+    // sortOptions,
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [],
       numberOfItems: 0,
     },
-    filters: resultFilters,
+    // filters: resultFilters,
     pageInfo: {
       records: response.meta.total,
       recordPerPage: response.meta.per_page,
-      nextPage: nextPage,
-      previousPage: previousPage,
+      // nextPage: nextPage,
+      // previousPage: previousPage,
       currentPage: response.meta.current_page,
       pageTypes: [
         "Search",

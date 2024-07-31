@@ -16,13 +16,13 @@ export interface State extends Props {
 /**
  * @title CaZco
  * @description Loaders and actions for adding CaZco Commerce Platform to your website.
- * @category Ecommmerce
+ * @category Ecommerce
  */
 export default function App(
   props: Props,
 ): App<Manifest, State> {
   const api = createHttpClient<OpenAPI>({
-    base: "http://loja.cazco.io",
+    base: "http://s623.cazco.link",
     fetcher: fetchSafe,
   });
 
