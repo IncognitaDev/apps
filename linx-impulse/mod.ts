@@ -1,7 +1,7 @@
-import type {
-  App as A,
-  AppContext as AC,
-  AppMiddlewareContext as AMC,
+import {
+  type App as A,
+  type AppContext as AC,
+  type AppMiddlewareContext as AMC,
 } from "deco/mod.ts";
 import { createHttpClient } from "../utils/http.ts";
 import type { Secret } from "../website/loaders/secret.ts";
@@ -10,6 +10,7 @@ import { middleware } from "./middleware.ts";
 import { ChaordicAPI } from "./utils/chaordic.ts";
 import { LinxAPI } from "./utils/client.ts";
 import { EventsAPI } from "./utils/events.ts";
+import { refetcherIfEmpty } from "./utils/refetcherIfEmpty.ts";
 
 export type App = ReturnType<typeof Linx>;
 export type AppContext = AC<App>;
@@ -66,6 +67,7 @@ export default function Linx({ secretKey, ...props }: State) {
   const api = createHttpClient<LinxAPI>({
     base: "http://api.linximpulse.com/",
     headers,
+    fetcher: refetcherIfEmpty,
   });
 
   const chaordicApi = createHttpClient<ChaordicAPI>({
