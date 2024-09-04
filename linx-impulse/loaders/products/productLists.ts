@@ -221,6 +221,13 @@ function toLinxImpulseShelf(
           value: shelfTitle,
         }));
 
+        if (shelf.displays[0].deadline) {
+          parsed.isVariantOf?.additionalProperty?.push(toPropertyValue({
+            name: "deadline",
+            value: shelf.displays[0].deadline,
+          }));
+        }
+
         return parsed;
       },
     ),

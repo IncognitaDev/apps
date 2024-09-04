@@ -29,6 +29,7 @@ interface RecommendationDisplay {
   references: ChaordicProduct[];
   recommendations: ChaordicProduct[];
   refreshReferenceUrl: string;
+  deadline: string;
 }
 
 export interface RecommendationShelf {
