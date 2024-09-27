@@ -1,5 +1,5 @@
 import type { ProductListingPage } from "../../commerce/types.ts";
-import { SortOption } from "../../commerce/types.ts";
+import type { SortOption } from "../../commerce/types.ts";
 import { capitalize } from "../../utils/capitalize.ts";
 import type { AppContext } from "../mod.ts";
 import {
@@ -7,7 +7,7 @@ import {
   MAXIMUM_REQUEST_QUANTITY,
 } from "../utils/getVariations.ts";
 import { GetURL, Hotsite, Search } from "../utils/graphql/queries.ts";
-import {
+import type {
   GetUrlQuery,
   GetUrlQueryVariables,
   HotsiteQuery,
@@ -25,7 +25,7 @@ import {
   toFilters,
   toProduct,
 } from "../utils/transform.ts";
-import { Filters } from "./productList.ts";
+import type { Filters } from "./productList.ts";
 
 export type Sort =
   | "NAME:ASC"
@@ -153,21 +153,28 @@ const searchLoader = async (
   ];
 
   const onlyMainVariant = props.onlyMainVariant ?? true;
-  const [minimumPrice, maximumPrice] =
-    url.searchParams.getAll("filtro")?.find((i) => i.startsWith("precoPor"))
-      ?.split(":")[1]?.split(";").map(Number) ??
-      url.searchParams.get("precoPor")?.split(";").map(Number) ?? [];
+  const [minimumPrice, maximumPrice] = url.searchParams
+    .getAll("filtro")
+    ?.find((i) => i.startsWith("precoPor"))
+    ?.split(":")[1]
+    ?.split(";")
+    .map(Number) ??
+    url.searchParams.get("precoPor")?.split(";").map(Number) ??
+    [];
 
   const offset = page <= 1 ? 0 : (page - 1) * limit;
 
-  const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>({
-    variables: {
-      url: url.pathname,
+  const urlData = await storefront.query<GetUrlQuery, GetUrlQueryVariables>(
+    {
+      variables: {
+        url: url.pathname,
+      },
+      ...GetURL,
     },
-    ...GetURL,
-  }, {
-    headers,
-  });
+    {
+      headers,
+    },
+  );
 
   const isHotsite = urlData.uri?.kind === "HOTSITE";
 

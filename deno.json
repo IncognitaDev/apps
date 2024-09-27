@@ -56,7 +56,8 @@
   "exclude": [
     "static",
     "README.md",
-    "**/README.md"
+    "**/README.md",
+    "**/*.gen.ts"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",

@@ -15,7 +15,7 @@ const includeSiteMaps = (
 ) => {
   const siteMapIncludeTags = [];
 
-  for (const include of (includes ?? [])) {
+  for (const include of includes ?? []) {
     siteMapIncludeTags.push(`
       <sitemap>
           <loc>${
@@ -45,10 +45,7 @@ export default function Sitemap(
   { include, customHeaders }: Props,
   { account }: AppContext,
 ) {
-  return async (
-    req: Request,
-    ctx: ConnInfo,
-  ) => {
+  return async (req: Request, ctx: ConnInfo) => {
     if (!account) {
       throw new Error("Missing account");
     }
