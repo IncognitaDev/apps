@@ -6,8 +6,9 @@ import { middleware } from "./middleware.ts";
 import { SP, VTEXCommerceStable } from "./utils/client.ts";
 import { fetchSafe } from "./utils/fetchVTEX.ts";
 import { OpenAPI as VCS } from "./utils/openapi/vcs.openapi.gen.ts";
-import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
 import { OpenAPI as MY } from "./utils/openapi/my.openapi.gen.ts";
+import { OpenAPI as API } from "./utils/openapi/api.openapi.gen.ts";
+import { OpenAPI as VP } from "./utils/openapi/vp.openapi.gen.ts";
 import { Segment } from "./utils/types.ts";
 import type { Secret } from "../website/loaders/secret.ts";
 import { removeDirtyCookies } from "../utils/normalize.ts";
@@ -84,9 +85,14 @@ export const color = 0xf71963;
  * @category Ecommmerce
  * @logo https://raw.githubusercontent.com/deco-cx/apps/main/vtex/logo.png
  */
-export default function VTEX(
-  { appKey, appToken, account, publicUrl, salesChannel, ...props }: Props,
-) {
+export default function VTEX({
+  appKey,
+  appToken,
+  account,
+  publicUrl,
+  salesChannel,
+  ...props
+}: Props) {
   const headers = new Headers();
   appKey &&
     headers.set(
@@ -131,6 +137,14 @@ export default function VTEX(
     processHeaders: removeDirtyCookies,
     headers: headers,
   });
+
+  const vp = createHttpClient<VP>({
+    base: `https://${account}.vtexpayments.com.br`,
+    fetcher: fetchSafe,
+    processHeaders: removeDirtyCookies,
+    headers: headers,
+  });
+
   const state = {
     ...props,
     salesChannel: salesChannel ?? "1",
@@ -142,10 +156,9 @@ export default function VTEX(
     vcs,
     my,
     api,
+    vp,
   };
-  const app: A<Manifest, typeof state, [
-    ReturnType<typeof workflow>,
-  ]> = {
+  const app: A<Manifest, typeof state, [ReturnType<typeof workflow>]> = {
     state,
     manifest,
     middleware,

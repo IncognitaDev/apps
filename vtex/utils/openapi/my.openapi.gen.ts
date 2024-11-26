@@ -248,6 +248,1592 @@ locale?: (null | string)
 pastReviews?: (null | string)
 }
 }
+/**
+ * Places order without having any prior cart information. This means all information on items, client, payment and shipping must be sent in the body.
+ * 
+ * >⚠️ The authentication of this endpoint is required if you are creating an order with an item that has an attachment that creates a Subscription. For more information, access [Subscriptions API](https://developers.vtex.com/docs/api-reference/subscriptions-api-v3).
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Checkout | CheckoutResources | **Orders Full Access** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint. To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"PUT /api/checkout/pub/orders": {
+searchParams: {
+/**
+ * Trade Policy (Sales Channel) identification. This query can be used to create an order for a specific sales channel.
+ */
+sc?: number
+/**
+ * Shows the product's estimated shipping date in the `shippingEstimate` field from the `orderForm`.
+ */
+individualShippingEstimates?: boolean
+}
+body: {
+/**
+ * Array of objects containing information on each of the order's items.
+ */
+items: {
+/**
+ * The SKU ID.
+ */
+id: string
+/**
+ * The quantity of items of this specific SKU in the cart to be simulated.
+ */
+quantity: number
+/**
+ * The ID of the seller responsible for this SKU. This ID can be found in your VTEX Admin.
+ */
+seller: string
+/**
+ * Comission.
+ */
+commission?: number
+/**
+ * Freight comission
+ */
+freightCommission?: number
+/**
+ * Item price within the context of the order without separating cents. For example, $24.99 is represented `2499`.
+ */
+price?: number
+/**
+ * Information on services sold along with the SKU. Example: a gift package.
+ */
+bundleItems?: {
+/**
+ * Service type.
+ */
+type?: string
+/**
+ * Service identifier.
+ */
+id?: string
+/**
+ * Service name.
+ */
+name?: string
+/**
+ * Service price. The last two digits are the cents.
+ */
+price?: number
+}[]
+/**
+ * Item attachment.
+ */
+itemAttachment?: {
+/**
+ * Attachment name.
+ */
+name?: string
+/**
+ * Content referring to the customization requested by the customer.
+ */
+content?: string
+}
+/**
+ * Array containing information on attachments.
+ */
+attachments?: string[]
+/**
+ * Array of price tags, each of which, modifies the price in some way, like discounts or rates that apply to the item in the context of the order.
+ */
+priceTags?: {
+/**
+ * Price tag identifier.
+ */
+identifier?: string
+/**
+ * `true` if price tag value is applied through a percentage.
+ */
+isPercentual?: boolean
+/**
+ * Price tag name.
+ */
+name?: string
+/**
+ * Price tag raw value.
+ */
+rawValue?: number
+/**
+ * Price tag value.
+ */
+value?: number
+}[]
+/**
+ * SKU measurement unit.
+ */
+measurementUnit?: string
+/**
+ * SKU unit multiplier.
+ */
+unitMultiplier?: number
+/**
+ * Indicates whether the order is a gift.
+ */
+isGift?: boolean
+}[]
+/**
+ * Customer's profile information. The `email` functions as a customer's ID.
+ * 
+ * For customers already in your database, sending only the email address is enough to register the order to the shopper’s existing account.
+ * 
+ * > If the shopper exists in you database but is not logged in, sending other profile information along with the email will cause the platform to fail placing the order. This happens because this action is interpreted as an attempt to edit profile data, which is not possible unless the customer is logged in to the store.
+ */
+clientProfileData: (null | {
+/**
+ * Customer's email address.
+ */
+email: (null | string)
+/**
+ * Customer's first name.
+ */
+firstName?: (null | string)
+/**
+ * Customer's last name.
+ */
+lastName?: string
+/**
+ * Type of the document informed by the customer.
+ */
+documentType?: string
+/**
+ * Document number informed by the customer.
+ */
+document?: string
+/**
+ * Customer's phone number.
+ */
+phone?: string
+/**
+ * Company name, if the customer is a legal entity.
+ */
+corporateName?: string
+/**
+ * Trade name, if the customer is a legal entity.
+ */
+tradeName?: string
+/**
+ * Corporate document, if the customer is a legal entity.
+ */
+corporateDocument?: string
+/**
+ * State inscription, if the customer is a legal entity.
+ */
+stateInscription?: string
+/**
+ * Corporate phone number, if the customer is a legal entity.
+ */
+corporatePhone?: string
+/**
+ * `true` if the customer is a legal entity.
+ */
+isCorporate?: boolean
+})
+/**
+ * Shipping information.
+ */
+shippingData: (null | {
+/**
+ * Shipping address.
+ * 
+ * For customers already in your data base, it is enough to send this object only with an `addressId`, which you may obtain from a [Cart simulation request](https://developers.vtex.com/vtex-rest-api/reference/shopping-cart#cartsimulation), for example.
+ */
+address?: (null | {
+/**
+ * Type of address. For example, `Residential` or `Pickup`, among others.
+ */
+addressType?: string
+/**
+ * Name of the person who is going to receive the order.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Postal Code.
+ */
+postalCode?: string
+/**
+ * City of the shipping address.
+ */
+city?: string
+/**
+ * State of the shipping address.
+ */
+state?: string
+/**
+ * Three letter ISO code of the country of the shipping address.
+ */
+country?: string
+/**
+ * Street of the shipping address.
+ */
+street?: string
+/**
+ * Number of the building, house or apartment in the shipping address.
+ */
+number?: string
+/**
+ * Neighborhood of the shipping address.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Complement that might help locate the shipping address more precisely in case of delivery.
+ */
+reference?: string
+/**
+ * Array containing two floats with geocoordinates, first longitude, then latitude.
+ */
+geoCoordinates?: number[]
+})
+/**
+ * Array of objects containing logistics information of each item.
+ */
+logisticsInfo?: {
+/**
+ * Index of the item in the `items` array, starting from 0.
+ */
+itemIndex: number
+/**
+ * Selected shipping option.
+ */
+selectedSla: (null | string)
+/**
+ * String with the selected delivery channel. This field supports the following values:  
+ * 
+ * - `delivery`,  
+ * 
+ * - `pickup-in-point`.
+ */
+selectedDeliveryChannel?: (null | string)
+/**
+ * Logistics reservation waiting time.
+ */
+lockTTL?: (null | string)
+/**
+ * Estimated time until delivery for the item.
+ */
+shippingEstimate?: string
+/**
+ * Shipping price for the item. Does not account for the whole order's shipping price.
+ */
+price: number
+/**
+ * In case of scheduled delivery, this object will contain information on the delivery window selected by the shopper.
+ */
+deliveryWindow?: {
+/**
+ * Delivery window starting day and time in UTC.
+ */
+startDateUtc?: string
+/**
+ * Delivery window ending day and time in UTC.
+ */
+endDateUtc?: string
+/**
+ * Delivery window price.
+ */
+price?: number
+/**
+ * Delivery window list price.
+ */
+lisPrice?: number
+/**
+ * Delivery window tax.
+ */
+tax?: number
+}
+}[]
+/**
+ * Indicate whether this object's information is up to date according to the order's items. An order can not be placed if `"outdated"`
+ */
+updateStatus?: string
+})
+/**
+ * Payment infomation.
+ */
+paymentData: {
+/**
+ * Gift card information, if it applies to the order.
+ */
+giftCards?: {
+/**
+ * Gift card redemption code.
+ */
+redemptionCode: string
+/**
+ * Gift card value.
+ */
+value: number
+/**
+ * Gift card balance.
+ */
+balance?: number
+/**
+ * Gift card name.
+ */
+name?: string
+/**
+ * Gift card ID.
+ */
+id?: string
+/**
+ * Indicates whether gift card is in use.
+ */
+inUse?: boolean
+/**
+ * Indicates whether gift card is special.
+ */
+isSpecialCard?: boolean
+}[]
+/**
+ * Array of gift card messages.
+ */
+giftCardMessages?: {
+[k: string]: any
+}[]
+/**
+ * Information on payment systems.
+ */
+paymentSystems?: {
+/**
+ * Payment system ID.
+ */
+id?: number
+/**
+ * Payment system name.
+ */
+name?: string
+/**
+ * Payment group name.
+ */
+groupName?: string
+/**
+ * Payment system validator.
+ */
+validator?: {
+/**
+ * Payment system validator.
+ */
+regex?: string
+/**
+ * Validator mask.
+ */
+mask?: string
+/**
+ * Card code regular expression.
+ */
+cardCodeRegex?: string
+/**
+ * Card code mask.
+ */
+cardCodeMask?: string
+/**
+ * Weights.
+ */
+weights?: number[]
+}
+/**
+ * String ID.
+ */
+stringId?: string
+/**
+ * Template.
+ */
+template?: string
+/**
+ * Indicates whether a document is required.
+ */
+requiresDocument?: boolean
+/**
+ * Indicates whether this payment system has been selected.
+ */
+selected?: boolean
+/**
+ * Indicates whether it is custom.
+ */
+isCustom?: boolean
+/**
+ * Description.
+ */
+description?: string
+}[]
+/**
+ * Payment information.
+ */
+payments: {
+/**
+ * Account ID.
+ */
+accountId?: string
+/**
+ * Payment bin.
+ */
+bin?: (null | string)
+/**
+ * Number of installments.
+ */
+installments: number
+/**
+ * Payment system.
+ */
+paymentSystem: number
+/**
+ * Reference value for calculating interest rates, in case it applies.
+ */
+referenceValue: number
+/**
+ * Value including interest, in case it applies.
+ */
+value: number
+}[]
+/**
+ * Indicates whether this object's information is up to date according to the order's items. An order can not be placed if `"outdated"`.
+ */
+updateStatus?: string
+}
+/**
+ * Coupon information.
+ */
+marketingData?: (null | {
+/**
+ * Sending an existing coupon code in this field will return the corresponding discount in the purchase. Use the [cart simulation](https://developers.vtex.com/vtex-rest-api/reference/orderform#orderformsimulation) request to check which coupons might apply before placing the order.
+ */
+coupon?: string
+/**
+ * UTM source.
+ */
+utmSource?: string
+/**
+ * UTM medium.
+ */
+utmMedium?: string
+/**
+ * UTM campaign
+ */
+utmCampaign?: string
+/**
+ * utmi_page (internal utm)
+ */
+utmiPage?: string
+/**
+ * utmi_part (internal utm)
+ */
+utmiPart?: string
+/**
+ * utmi_campaign (internal utm)
+ */
+utmiCampaign?: string
+})
+/**
+ * Optional field meant to hold additional information about the order. We recommend using this field for text, not data formats such as `JSON` even if escaped. For that purpose, see [Creating customizable fields](https://developers.vtex.com/vtex-rest-api/docs/creating-customizable-fields-in-the-cart-with-checkout-api-1)
+ */
+openTextField?: string
+/**
+ * Sales Associate information.
+ */
+salesAssociateData?: {
+/**
+ * Sales Associate (Seller) identification code. All information should be registered by the merchant. Maximum of 100 characters.
+ */
+salesAssociateId?: string
+}
+minItems?: 0
+}
+response: {
+/**
+ * This is `null` since this request does not depend on any previously existing orderForm information in the platform.
+ */
+orderForm?: (null | string)
+/**
+ * Information on each transaction pertinent to the order placed.
+ */
+transactionData?: {
+/**
+ * Information on each merchant transaction.
+ */
+merchantTransactions?: {
+/**
+ * ID of the seller.
+ */
+id?: string
+/**
+ * ID of the transaction in the platform.
+ */
+transactionId?: string
+/**
+ * Name of the merchant responsible for the sale.
+ */
+merchantName?: string
+/**
+ * Information on each payment pertinent to the transaction.
+ */
+payments?: {
+/**
+ * Payment system.
+ */
+paymentSystem?: number
+/**
+ * Payment bin.
+ */
+bin?: (null | string)
+/**
+ * Account ID.
+ */
+accountId?: (null | string)
+/**
+ * Token ID.
+ */
+tokenId?: (null | string)
+/**
+ * Total value to be paid in this payment.
+ */
+value?: number
+/**
+ * Reference value over which interests may be applied.
+ */
+referenceValue?: number
+/**
+ * Gift card redemption code.
+ */
+giftCardRedemptionCode?: (null | string)
+/**
+ * Gift card provider.
+ */
+giftCardProvider?: (null | string)
+/**
+ * Gift card ID.
+ */
+giftCardId?: (null | string)
+}[]
+}[]
+/**
+ * Receiver URI.
+ */
+receiverUri?: string
+/**
+ * Template of the gateway callback path, which may later be used to send information about the transaction.
+ */
+gatewayCallbackTemplatePath?: string
+}
+/**
+ * Information on each of the orders created.
+ */
+orders?: {
+/**
+ * ID of the order in the Order Management System (OMS).
+ */
+orderId?: string
+/**
+ * Order group. Orders that involve different sellers are split into different orders of a same order group.
+ */
+orderGroup?: string
+/**
+ * State.
+ */
+state?: (null | string)
+/**
+ * Indicates whether order is checked in.
+ */
+isCheckedIn?: boolean
+/**
+ * ID of the order in the seller.
+ */
+sellerOrderId?: (null | string)
+/**
+ * Store ID.
+ */
+storeId?: (null | string)
+/**
+ * Checked in pickup point.
+ */
+checkedInPickupPointId?: (null | string)
+/**
+ * Value of the order.
+ */
+value?: number
+/**
+ * Information on each item in the order.
+ */
+items?: {
+/**
+ * Unique ID.
+ */
+uniqueId?: string
+/**
+ * ID of the item.
+ */
+id?: string
+/**
+ * Product ID.
+ */
+productId?: string
+/**
+ * Product Ref ID.
+ */
+productRefId?: string
+/**
+ * Ref ID.
+ */
+refId?: string
+/**
+ * European Article Number.
+ */
+ean?: (null | string)
+/**
+ * Product name.
+ */
+name?: string
+/**
+ * SKU name.
+ */
+skuName?: string
+/**
+ * Modal type.
+ */
+modalType?: (null | string)
+/**
+ * Parent item index.
+ */
+parentItemIndex?: (null | number)
+/**
+ * Parent assembly binding.
+ */
+parentAssemblyBinding?: (null | string)
+/**
+ * Price expiration date and time.
+ */
+priceValidUntil?: string
+/**
+ * Tax value in cents.
+ */
+tax?: number
+/**
+ * Price in cents.
+ */
+price?: number
+/**
+ * List price in cents.
+ */
+listPrice?: number
+/**
+ * Manual price in cents.
+ */
+manualPrice?: (null | number)
+/**
+ * User that applied the manual price, if that is the case.
+ */
+manualPriceAppliedBy?: (null | string)
+/**
+ * Selling price in cents. Note that this field may be subject to rounding discrepancies. We recommend retrieving data from the `priceDefinition` data structure instead.
+ */
+sellingPrice?: number
+/**
+ * Reward value in cents.
+ */
+rewardValue?: number
+/**
+ * Indicates whether item is a gift.
+ */
+isGift?: boolean
+/**
+ * Additional information.
+ */
+additionalInfo?: {
+/**
+ * Dimension.
+ */
+dimension?: (null | string)
+/**
+ * Brand name.
+ */
+brandName?: string
+/**
+ * Brand ID.
+ */
+brandId?: string
+/**
+ * Offering information.
+ */
+offeringInfo?: (null | string)
+/**
+ * Offering type.
+ */
+offeringType?: (null | string)
+/**
+ * Offering type ID.
+ */
+offeringTypeId?: (null | string)
+}
+/**
+ * Presale date.
+ */
+preSaleDate?: (null | string)
+/**
+ * Product category IDs.
+ */
+productCategoryIds?: string
+/**
+ * Object, where each field is an ID from `productCategoryIds`.
+ */
+productCategories?: {
+/**
+ * Product category corresponding to the ID in the field key.
+ */
+"{ID}"?: string
+}
+/**
+ * Quantity.
+ */
+quantity?: number
+/**
+ * Seller.
+ */
+seller?: string
+/**
+ * Sellers involved in the chain. The list should contain only one seller, unless it is a [Multilevel Omnichannel Inventory](https://help.vtex.com/pt/tutorial/multilevel-omnichannel-inventory--7M1xyCZWUyCB7PcjNtOyw4) order.
+ */
+sellerChain?: string[]
+/**
+ * Image URL.
+ */
+imageUrl?: string
+/**
+ * Detail URL.
+ */
+detailUrl?: string
+/**
+ * Information on services sold along with the SKU. Example: a gift package.
+ */
+bundleItems?: {
+/**
+ * Service type.
+ */
+type?: string
+/**
+ * Service identifier.
+ */
+id?: number
+/**
+ * Service name.
+ */
+name?: string
+/**
+ * Service price in cents.
+ */
+price?: number
+}[]
+/**
+ * Array containing information on attachments.
+ */
+attachments?: string[]
+/**
+ * Array of price tags, each of which, modifies the price in some way, like discounts or rates that apply to the item in the context of the order.
+ */
+priceTags?: {
+/**
+ * Price tag identifier.
+ */
+identifier?: (null | string)
+/**
+ * Indicates whether price tag value is applied through a percentage.
+ */
+isPercentual?: boolean
+/**
+ * Price tag name.
+ */
+name?: string
+/**
+ * Price tag raw value.
+ */
+rawValue?: number
+/**
+ * Price tag value.
+ */
+value?: number
+}[]
+/**
+ * Availability
+ */
+availability?: string
+/**
+ * Measurement unit
+ */
+measurementUnit?: string
+/**
+ * Unit multiplier
+ */
+unitMultiplier?: number
+/**
+ * Manufacturer code.
+ */
+manufacturerCode?: (null | string)
+/**
+ * Price information for all units of a specific item.
+ */
+priceDefinition?: {
+/**
+ * Item's calculated unitary selling price in cents.
+ */
+calculatedSellingPrice?: number
+/**
+ * Total value for all units of the item in cents.
+ */
+total?: number
+/**
+ * Array of objects, each containing value (in cents) and quantity for the different rounding instances that can be combined to form the correctly rounded total.
+ */
+sellingPrices?: {
+/**
+ * Value in cents for that specific rounding.
+ */
+value?: number
+/**
+ * Rounding quantity, meaning how many items are rounded to this value.
+ */
+quantity?: number
+}[]
+}
+}[]
+/**
+ * Information on each seller.
+ */
+sellers?: {
+/**
+ * Seller ID.
+ */
+id?: string
+/**
+ * Seller name.
+ */
+name?: string
+/**
+ * Seller logo.
+ */
+logo?: (null | string)
+}[]
+/**
+ * Information on order totals.
+ */
+totals?: {
+/**
+ * Total ID.
+ */
+id?: string
+/**
+ * Total name.
+ */
+name?: string
+/**
+ * Total value.
+ */
+value?: number
+}[]
+/**
+ * Customer's profile information.
+ */
+clientProfileData?: (null | {
+/**
+ * Email address.
+ */
+email?: (null | string)
+/**
+ * First name.
+ */
+firstName?: (null | string)
+/**
+ * Last name.
+ */
+lastName?: string
+/**
+ * Type of the document informed by the customer.
+ */
+documentType?: string
+/**
+ * Document informed by the customer.
+ */
+document?: string
+/**
+ * Phone number.
+ */
+phone?: string
+/**
+ * Company name, if the customer is a legal entity.
+ */
+corporateName?: (null | string)
+/**
+ * Trade name, if the customer is a legal entity.
+ */
+tradeName?: (null | string)
+/**
+ * Corporate document, if the customer is a legal entity.
+ */
+corporateDocument?: (null | string)
+/**
+ * State inscription, if the customer is a legal entity.
+ */
+stateInscription?: (null | string)
+/**
+ * Corporate phone number, if the customer is a legal entity.
+ */
+corporatePhone?: (null | string)
+/**
+ * Indicates whether the customer is a legal entity.
+ */
+isCorporate?: boolean
+/**
+ * Indicates whether profile is complete on loading.
+ */
+profileCompleteOnLoading?: boolean
+/**
+ * Indicates whether profile presents error on loading.
+ */
+profileErrorOnLoading?: (null | boolean)
+/**
+ * Customer class.
+ */
+customerClass?: (null | string)
+})
+/**
+ * Information on rates and benefits that apply to the order.
+ */
+ratesAndBenefitsData?: {
+/**
+ * List with rates and benefits identifiers.
+ */
+rateAndBenefitsIdentifiers?: string[]
+/**
+ * List with rates and benefits teasers.
+ */
+teaser?: string[]
+}
+/**
+ * Shipping information pertinent to the order.
+ */
+shippingData?: {
+/**
+ * Address information.
+ */
+address?: (null | {
+/**
+ * Type of address. For example, `Residential` or `Pickup`.
+ */
+addressType?: string
+/**
+ * Name of the person who is going to receive the order.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Indicates whether address is disposable.
+ */
+isDisposable?: boolean
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City of the shipping address.
+ */
+city?: string
+/**
+ * State of the shipping address.
+ */
+state?: string
+/**
+ * Three letter ISO code of the country of the shipping address.
+ */
+country?: string
+/**
+ * Street of the shipping address.
+ */
+street?: string
+/**
+ * Number of the building, house or apartment in the shipping address.
+ */
+number?: string
+/**
+ * Neighborhood of the shipping address.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Complement that might help locate the shipping address more precisely in case of delivery.
+ */
+reference?: (null | string)
+/**
+ * Array containing two floats with geocoordinates, first longitude, then latitude.
+ */
+geoCoordinates?: number[]
+})
+/**
+ * Array with logistics information. Each object in this array corresponds to an object in the `items` array, based on the respective `itemIndex`.
+ */
+logisticsInfo?: {
+/**
+ * Index corresponding to the position of the object in the `items` array.
+ */
+itemIndex?: number
+/**
+ * SLA selected by the customer.
+ */
+selectedSla?: (null | string)
+/**
+ * Delivery channel selected by the customer. For example, `"delivery"` or `"pickup-in-point"`.
+ */
+selectedDeliveryChannel?: (null | string)
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Information on available SLAs.
+ */
+slas?: {
+/**
+ * SLA ID.
+ */
+id?: string
+/**
+ * Delivery channel.
+ */
+deliveryChannel?: string
+/**
+ * SLA name.
+ */
+name?: string
+/**
+ * Information on each delivery ID.
+ */
+deliveryIds?: {
+/**
+ * Courier ID.
+ */
+courierId?: string
+/**
+ * Warehouse ID.
+ */
+warehouseId?: string
+/**
+ * Warehouse ID.
+ */
+dockId?: string
+/**
+ * Courier name.
+ */
+courierName?: string
+/**
+ * Quantity.
+ */
+quantity?: number
+}[]
+/**
+ * Shipping estimate. For instance, Three business days will be represented `3bd`.
+ */
+shippingEstimate?: string
+/**
+ * When using the query parameter `individualShippingEstimates=true`, it will contain the estimated shipping date (e.g. `2023-09-09T11:29:00+00:00`), otherwise it will contain `null`.
+ */
+shippingEstimateDate?: (null | string)
+/**
+ * Shows the product's estimated shipping date in the `shippingEstimate` field from the `orderForm`.
+ */
+useIndividualShippingEstimates?: boolean
+/**
+ * Estimate date of delivery.
+ */
+lockTTL?: (null | string)
+/**
+ * Price in cents.
+ */
+price?: number
+/**
+ * List price in cents.
+ */
+listPrice?: number
+/**
+ * Tax in cents.
+ */
+tax?: number
+/**
+ * Information on the pickup store.
+ */
+pickupStoreInfo?: {
+/**
+ * Indicates whether it is the pickup store.
+ */
+isPickupStore?: boolean
+/**
+ * Friendly name.
+ */
+friendlyName?: (null | string)
+/**
+ * Address information.
+ */
+address?: (null | {
+/**
+ * Type of address. For example, `Residential` or `Pickup`.
+ */
+addressType?: string
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City of the shipping address.
+ */
+city?: string
+/**
+ * State of the shipping address.
+ */
+state?: string
+/**
+ * Three letter ISO code of the country of the shipping address.
+ */
+country?: string
+/**
+ * Street of the shipping address.
+ */
+street?: string
+/**
+ * Number of the building, house or apartment in the shipping address.
+ */
+number?: string
+/**
+ * Neighborhood of the shipping address.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Complement that might help locate the shipping address more precisely in case of delivery.
+ */
+reference?: (null | string)
+/**
+ * Array containing two floats with geocoordinates, first longitude, then latitude.
+ */
+geoCoordinates?: number[]
+})
+/**
+ * Additional information.
+ */
+additionalInfo?: (null | string)
+/**
+ * Corresponding dock ID.
+ */
+dockId?: (null | string)
+}
+/**
+ * Pickup point ID.
+ */
+pickupPointId?: (null | string)
+/**
+ * Pickup point distance.
+ */
+pickupDistance?: number
+/**
+ * Polygon name.
+ */
+polygonName?: (null | string)
+/**
+ * Transit time. For instance, "three business days" is represented `3bd`.
+ */
+transitTime?: string
+}[]
+/**
+ * List of countries that the item may be shipped to.
+ */
+shipsTo?: string[]
+/**
+ * Item ID.
+ */
+itemId?: string
+/**
+ * List of available delivery channels.
+ */
+deliveryChannels?: {
+/**
+ * Delivery channel ID.
+ */
+id?: string
+}[]
+}[]
+/**
+ * Array with information on the selected addresses for the order.
+ */
+selectedAddresses?: {
+/**
+ * Type of address. For example, `Residential` or `Pickup`.
+ */
+addressType?: string
+/**
+ * Name of the person who is going to receive the order.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Indicates whether address is disposable.
+ */
+isDisposable?: boolean
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City of the shipping address.
+ */
+city?: string
+/**
+ * State of the shipping address.
+ */
+state?: string
+/**
+ * Three letter ISO code of the country of the shipping address.
+ */
+country?: string
+/**
+ * Street of the shipping address.
+ */
+street?: string
+/**
+ * Number of the building, house or apartment in the shipping address.
+ */
+number?: string
+/**
+ * Neighborhood of the shipping address.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Complement that might help locate the shipping address more precisely in case of delivery.
+ */
+reference?: (null | string)
+/**
+ * Array containing two floats with geocoordinates, first longitude, then latitude.
+ */
+geoCoordinates?: number[]
+}[]
+/**
+ * Array with information on the available addresses for the order.
+ */
+availableAddresses?: {
+/**
+ * Type of address. For example, `Residential` or `Pickup`.
+ */
+addressType?: string
+/**
+ * Name of the person who is going to receive the order.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Indicates whether address is disposable.
+ */
+isDisposable?: boolean
+/**
+ * Postal code.
+ */
+postalCode?: string
+/**
+ * City of the shipping address.
+ */
+city?: string
+/**
+ * State of the shipping address.
+ */
+state?: string
+/**
+ * Three letter ISO code of the country of the shipping address.
+ */
+country?: string
+/**
+ * Street of the shipping address.
+ */
+street?: string
+/**
+ * Number of the building, house or apartment in the shipping address.
+ */
+number?: string
+/**
+ * Neighborhood of the shipping address.
+ */
+neighborhood?: string
+/**
+ * Complement to the shipping address, in case it applies.
+ */
+complement?: (null | string)
+/**
+ * Complement that might help locate the shipping address more precisely in case of delivery.
+ */
+reference?: (null | string)
+/**
+ * Array containing two floats with geocoordinates, first longitude, then latitude.
+ */
+geoCoordinates?: number[]
+}[]
+}
+/**
+ * Information on the order's payment.
+ */
+paymentData?: {
+/**
+ * Gift card information, if it applies to the order.
+ */
+giftCards?: {
+/**
+ * Gift card redemption code.
+ */
+redemptionCode?: string
+/**
+ * Gift card value in cents.
+ */
+value?: number
+/**
+ * Gift card balance in cents.
+ */
+balance?: number
+/**
+ * Gift card name.
+ */
+name?: string
+/**
+ * Gift card ID.
+ */
+id?: string
+/**
+ * Indicates whether gift card is in use.
+ */
+inUse?: boolean
+/**
+ * Indicates whether gift card is special.
+ */
+isSpecialCard?: boolean
+}[]
+/**
+ * Information on each transaction pertinent to the order.
+ */
+transactions?: {
+/**
+ * Indicates whether transaction is active.
+ */
+isActive?: boolean
+/**
+ * Transaction ID.
+ */
+transactionId?: string
+/**
+ * Merchant name.
+ */
+merchantName?: string
+/**
+ * Information on each payment.
+ */
+payments?: {
+/**
+ * Account ID.
+ */
+accountId?: string
+/**
+ * Bin.
+ */
+bin?: (null | string)
+/**
+ * Number of installments.
+ */
+installments?: number
+/**
+ * Payment system.
+ */
+paymentSystem?: number
+/**
+ * Reference value for calculating interest rates, in case it applies. Displayed in cents.
+ */
+referenceValue?: number
+/**
+ * Value including interest, in case it applies. Displayed in cents.
+ */
+value?: number
+}[]
+/**
+ * Indicates whather transaction is shared.
+ */
+sharedTransaction?: boolean
+}[]
+}
+/**
+ * Item metadata.
+ */
+itemMetadata?: {
+/**
+ * List of objects containing metadata on each item in the order.
+ */
+items?: {
+/**
+ * Item ID.
+ */
+id?: string
+/**
+ * Seller.
+ */
+seller?: string
+/**
+ * Product name.
+ */
+name?: string
+/**
+ * SKU name.
+ */
+skuName?: string
+/**
+ * Product ID.
+ */
+productId?: string
+/**
+ * Ref ID.
+ */
+refId?: string
+/**
+ * European Article Number.
+ */
+ean?: (null | string)
+/**
+ * Image URL.
+ */
+imageUrl?: string
+/**
+ * Detail URL.
+ */
+detailUrl?: string
+}[]
+}
+/**
+ * Sales channel.
+ */
+salesChannel?: string
+/**
+ * Follow up email address.
+ */
+followUpEmail?: string
+/**
+ * Creation date.
+ */
+creationDate?: string
+/**
+ * Last change.
+ */
+lastChange?: string
+/**
+ * Time zone creation date.
+ */
+timeZoneCreationDate?: string
+/**
+ * Time zone last change.
+ */
+timeZoneLastChange?: string
+/**
+ * Indicates whether order is completed.
+ */
+isCompleted?: boolean
+/**
+ * Host name.
+ */
+hostName?: string
+/**
+ * Merchant name.
+ */
+merchantName?: (null | string)
+/**
+ * User type.
+ */
+userType?: string
+/**
+ * Rounding error.
+ */
+roundingError?: number
+/**
+ * Indicates whether edition is allowed.
+ */
+allowEdition?: boolean
+/**
+ * Indicates whether cancelation is allowed.
+ */
+allowCancelation?: boolean
+/**
+ * Indicates whether seller changing is allowed.
+ */
+allowChangeSeller?: boolean
+/**
+ * Indicates whether user data is visible.
+ */
+isUserDataVisible?: boolean
+/**
+ * `orderForm` creation date.
+ */
+orderFormCreationDate?: string
+/**
+ * Sales Associate (Seller) identification code.
+ */
+salesAssociateId?: string
+}[]
+}
+}
+/**
+ * Order processing callback request, which is made after an order's payment is approved.
+ * 
+ * > This request has to be made within five minutes after the [Place order](https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders) or [Place order from existing cart](https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction) request has been made, or else, the order will not be processed.
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Checkout | CheckoutResources | **Save Order Configuration** |
+ * 
+ * There are no applicable [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) for this resource list. You must [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) and add at least one of the resources above in order to use this endpoint. To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ * 
+ * >❗ To prevent integrations from having excessive permissions, consider the [best practices for managing app keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm) when assigning License Manager roles to integrations.
+ */
+"POST /api/checkout/pub/gatewayCallback/:orderGroup": {
+searchParams: {
+/**
+ * Shows the product's estimated shipping date in the `shippingEstimate` field from the `orderForm`.
+ */
+individualShippingEstimates?: boolean
+}
+}
 }
 /**
  * Request body.
