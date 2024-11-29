@@ -43,26 +43,29 @@ interface Props {
 export default async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Document[]> {
-  const { vcs } = ctx;
+  const { my } = ctx;
   const { acronym, fields, where, sort, skip = 0, take = 10 } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
   const limits = resourceRange(skip, take);
 
-  const documents = await vcs["GET /api/dataentities/:acronym/search"]({
-    acronym,
-    _fields: fields,
-    _where: where,
-    _sort: sort,
-  }, {
-    headers: {
-      accept: "application/vnd.vtex.ds.v10+json",
-      "content-type": "application/json",
-      cookie,
-      "REST-Range": `resources=${limits.from}-${limits.to}`,
+  const documents = await my["GET /api/dataentities/:acronym/search"](
+    {
+      acronym,
+      _fields: fields,
+      _where: where,
+      _sort: sort,
     },
-  }).then((response) => response.json());
+    {
+      headers: {
+        accept: "application/vnd.vtex.ds.v10+json",
+        "content-type": "application/json",
+        cookie,
+        "REST-Range": `resources=${limits.from}-${limits.to}`,
+      },
+    }
+  ).then((response) => response.json());
 
   return documents;
 }

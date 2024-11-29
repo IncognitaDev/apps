@@ -24,34 +24,38 @@ export type Props = {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product | null> => {
-  const { vcs } = ctx;
+  const { my } = ctx;
   const sc = 1;
 
-  const sku = await vcs
-    ["GET /api/catalog_system/pvt/sku/stockkeepingunitbyid/:skuId"]({
-      skuId: props.productID,
-    }).then((res) => res.json());
+  const sku = await my[
+    "GET /api/catalog_system/pvt/sku/stockkeepingunitbyid/:skuId"
+  ]({
+    skuId: props.productID,
+  }).then((res) => res.json());
 
   if (!sku.IsActive) return null;
 
   const [skus, salesChannels, ...simulations] = await Promise.all([
-    vcs
-      ["GET /api/catalog_system/pvt/sku/stockkeepingunitByProductId/:productId"](
-        {
-          productId: sku.ProductId,
-        },
-      ).then((res) => res.json()),
-    vcs["GET /api/catalog_system/pvt/saleschannel/list"]({})
-      .then((res) => res.json()),
+    my[
+      "GET /api/catalog_system/pvt/sku/stockkeepingunitByProductId/:productId"
+    ]({
+      productId: sku.ProductId,
+    }).then((res) => res.json()),
+    my["GET /api/catalog_system/pvt/saleschannel/list"]({}).then((res) =>
+      res.json()
+    ),
     ...sku.SkuSellers.map(({ SellerId }) =>
-      vcs["POST /api/checkout/pub/orderForms/simulation"]({
-        RnbBehavior: 1,
-        sc,
-      }, {
-        body: { items: [{ id: `${sku.Id}`, seller: SellerId, quantity: 1 }] },
-      }).then((res) => res.json())
+      my["POST /api/checkout/pub/orderForms/simulation"](
+        {
+          RnbBehavior: 1,
+          sc,
+        },
+        {
+          body: { items: [{ id: `${sku.Id}`, seller: SellerId, quantity: 1 }] },
+        }
+      ).then((res) => res.json())
     ),
   ]);
 
@@ -63,16 +67,17 @@ const loader = async (
   const additionalProperty = [
     sku.AlternateIds.RefId
       ? toAdditionalPropertyReferenceId({
-        name: "RefId",
-        value: sku.AlternateIds.RefId,
-      })
+          name: "RefId",
+          value: sku.AlternateIds.RefId,
+        })
       : null,
     ...Object.entries(sku.ProductCategories ?? {}).map(([propertyID, value]) =>
       toAdditionalPropertyCategory({ propertyID, value })
     ),
-    ...Object.entries(sku.ProductClusterNames ?? {}).map((
-      [propertyID, value],
-    ) => toAdditionalPropertyCluster({ propertyID, value })),
+    ...Object.entries(sku.ProductClusterNames ?? {}).map(
+      ([propertyID, value]) =>
+        toAdditionalPropertyCluster({ propertyID, value })
+    ),
     ...sku.SkuSpecifications.flatMap((spec) =>
       spec.FieldValues.map((value, it) =>
         toAdditionalPropertySpecification({
@@ -82,11 +87,13 @@ const loader = async (
         })
       )
     ),
-    ...sku.SalesChannels.map((channel): PropertyValue => ({
-      "@type": "PropertyValue",
-      name: "salesChannel",
-      propertyID: channel.toString(),
-    })),
+    ...sku.SalesChannels.map(
+      (channel): PropertyValue => ({
+        "@type": "PropertyValue",
+        name: "salesChannel",
+        propertyID: channel.toString(),
+      })
+    ),
   ].filter((p): p is PropertyValue => Boolean(p));
 
   const groupAdditionalProperty = sku.ProductSpecifications.flatMap((spec) =>
@@ -99,59 +106,61 @@ const loader = async (
     )
   );
 
-  const offers = simulations.flatMap(({ items, paymentData }) =>
-    items?.map((item): Offer | null => {
-      const {
-        sellingPrice,
-        listPrice,
-        price,
-        seller,
-        priceValidUntil,
-        availability,
-      } = item;
-      const spotPrice = sellingPrice || price;
+  const offers = simulations
+    .flatMap(({ items, paymentData }) =>
+      items?.map((item): Offer | null => {
+        const {
+          sellingPrice,
+          listPrice,
+          price,
+          seller,
+          priceValidUntil,
+          availability,
+        } = item;
+        const spotPrice = sellingPrice || price;
 
-      if (!spotPrice || !listPrice) return null;
+        if (!spotPrice || !listPrice) return null;
 
-      return {
-        "@type": "Offer",
-        price: spotPrice / 100,
-        seller: seller,
-        priceValidUntil: priceValidUntil,
-        inventoryLevel: {}, // TODO: Could not find this info anywhere
-        availability: availability === "available"
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-        priceSpecification: [
-          {
-            "@type": "UnitPriceSpecification",
-            priceType: "https://schema.org/ListPrice",
-            price: listPrice / 100,
-          },
-          {
-            "@type": "UnitPriceSpecification",
-            priceType: "https://schema.org/SalePrice",
-            price: spotPrice / 100,
-          },
-          ...paymentData?.installmentOptions?.flatMap((
-            option,
-          ): UnitPriceSpecification =>
-            option.installments.map((
-              i: { count: number; value: number; total: number },
-            ) => ({
+        return {
+          "@type": "Offer",
+          price: spotPrice / 100,
+          seller: seller,
+          priceValidUntil: priceValidUntil,
+          inventoryLevel: {}, // TODO: Could not find this info anywhere
+          availability:
+            availability === "available"
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          priceSpecification: [
+            {
+              "@type": "UnitPriceSpecification",
+              priceType: "https://schema.org/ListPrice",
+              price: listPrice / 100,
+            },
+            {
               "@type": "UnitPriceSpecification",
               priceType: "https://schema.org/SalePrice",
-              priceComponentType: "https://schema.org/Installment",
-              name: option.paymentName,
-              billingDuration: i.count,
-              billingIncrement: i.value / 100,
-              price: i.total / 100,
-            }))
-          ) ?? [],
-        ],
-      };
-    })
-  ).filter((o): o is Offer => Boolean(o));
+              price: spotPrice / 100,
+            },
+            ...(paymentData?.installmentOptions?.flatMap(
+              (option): UnitPriceSpecification =>
+                option.installments.map(
+                  (i: { count: number; value: number; total: number }) => ({
+                    "@type": "UnitPriceSpecification",
+                    priceType: "https://schema.org/SalePrice",
+                    priceComponentType: "https://schema.org/Installment",
+                    name: option.paymentName,
+                    billingDuration: i.count,
+                    billingIncrement: i.value / 100,
+                    price: i.total / 100,
+                  })
+                )
+            ) ?? []),
+          ],
+        };
+      })
+    )
+    .filter((o): o is Offer => Boolean(o));
 
   return {
     "@type": "Product",
@@ -171,21 +180,21 @@ const loader = async (
     isVariantOf: {
       "@type": "ProductGroup",
       url: sku.DetailUrl,
-      hasVariant: skus
-        ?.filter((x) => x.IsActive)
-        .map(({ Id }) => ({
-          "@type": "Product",
-          productID: `${Id}`,
-          sku: `${Id}`,
-        })) ?? [],
+      hasVariant:
+        skus
+          ?.filter((x) => x.IsActive)
+          .map(({ Id }) => ({
+            "@type": "Product",
+            productID: `${Id}`,
+            sku: `${Id}`,
+          })) ?? [],
       additionalProperty: groupAdditionalProperty,
       productGroupID,
       name: sku.ProductName,
       description: sku.ProductDescription,
     },
     additionalProperty,
-    releaseDate: sku.ReleaseDate &&
-      new Date(sku.ReleaseDate).toISOString(),
+    releaseDate: sku.ReleaseDate && new Date(sku.ReleaseDate).toISOString(),
     brand: {
       "@type": "Brand",
       "@id": sku.BrandId,

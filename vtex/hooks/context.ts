@@ -11,18 +11,24 @@ export interface Context {
   wishlist: WishlistItem[] | null;
 }
 
+export interface ContextState {
+  cart: { value: OrderForm | null };
+  user: { value: Person | null };
+  wishlist: { value: WishlistItem[] | null };
+}
+
 const loading = signal<boolean>(true);
-const context = {
-  cart: IS_BROWSER && signal<OrderForm | null>(null) || { value: null },
-  user: IS_BROWSER && signal<Person | null>(null) || { value: null },
-  wishlist: IS_BROWSER && signal<WishlistItem[] | null>(null) ||
-    { value: null },
+
+const context: ContextState = {
+  cart: IS_BROWSER ? signal<OrderForm | null>(null) : { value: null },
+  user: IS_BROWSER ? signal<Person | null>(null) : { value: null },
+  wishlist: IS_BROWSER ? signal<WishlistItem[] | null>(null) : { value: null },
 };
 
 let queue = Promise.resolve();
 let abort = () => {};
 const enqueue = (
-  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>,
+  cb: (signal: AbortSignal) => Promise<Partial<Context>> | Partial<Context>
 ) => {
   abort();
 
@@ -56,18 +62,21 @@ const enqueue = (
 };
 
 const load = (signal: AbortSignal) =>
-  invoke({
-    cart: invoke.vtex.loaders.cart(),
-    user: invoke.vtex.loaders.user(),
-    wishlist: invoke.vtex.loaders.wishlist({ allRecords: true }),
-  }, { signal });
+  invoke(
+    {
+      cart: invoke.vtex.loaders.cart(),
+      user: invoke.vtex.loaders.user(),
+      wishlist: invoke.vtex.loaders.wishlist({ allRecords: true }),
+    },
+    { signal }
+  );
 
 if (IS_BROWSER) {
   enqueue(load);
 
   document.addEventListener(
     "visibilitychange",
-    () => document.visibilityState === "visible" && enqueue(load),
+    () => document.visibilityState === "visible" && enqueue(load)
   );
 }
 

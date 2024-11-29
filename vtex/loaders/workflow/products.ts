@@ -13,13 +13,13 @@ export type Props = {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[]> => {
-  const { vcs } = ctx;
+  const { my } = ctx;
 
-  const ids = await vcs
-    ["GET /api/catalog_system/pvt/sku/stockkeepingunitids"](props)
-    .then((res) => res.json());
+  const ids = await my["GET /api/catalog_system/pvt/sku/stockkeepingunitids"](
+    props
+  ).then((res) => res.json());
 
   return ids.map((productID) => ({
     "@type": "Product",

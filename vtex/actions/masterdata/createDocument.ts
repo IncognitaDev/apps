@@ -14,10 +14,10 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
   /* no-explicit-any */
 ): Promise<CreateNewDocument> => {
-  const { vcs, vcsDeprecated } = ctx;
+  const { my, vcsDeprecated } = ctx;
   const { data, acronym, isPrivateEntity } = props;
   const { cookie } = parseCookie(req.headers, ctx.account);
 
@@ -30,15 +30,14 @@ const action = async (
     },
   };
 
-  const response =
-    await (isPrivateEntity
-      ? vcs[`POST /api/dataentities/:acronym/documents`](
+  const response = await (isPrivateEntity
+    ? my[`POST /api/dataentities/:acronym/documents`](
         { acronym },
-        requestOptions,
+        requestOptions
       )
-      : vcsDeprecated[`POST /api/dataentities/:acronym/documents`](
+    : vcsDeprecated[`POST /api/dataentities/:acronym/documents`](
         { acronym },
-        requestOptions,
+        requestOptions
       ));
 
   return response.json();

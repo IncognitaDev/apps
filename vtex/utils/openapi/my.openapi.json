@@ -3336,6 +3336,274 @@
         },
         "deprecated": false
       }
+    },
+    "/api/checkout/pub/profiles": {
+      "get": {
+        "tags": [
+          "Cart attachments"
+        ],
+        "summary": "Get client profile by email",
+        "description": "Retrieves a client's profile information by providing an email address.\n\r\n\rIf the response body fields are empty, the following situations may have occurred:\n\r\n\r1. There is no client registered with the email address provided in your store, or;\n\r2. Client profile is invalid or incomplete. However, you can use the query parameter `ensureComplete=false` to get incomplete profiles. For more information, see [SmartCheckout - Customer information automatic fill-in](https://help.vtex.com/en/tutorial/smartcheckout-customer-information-automatic-fill-in--2Nuu3xAFzdhIzJIldAdtan).\r\n\r\n>⚠️ The authentication of this endpoint can change depending on the customer context. If you are consulting information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.\r\n\r\n## Permissions\r\n\r\nAny user or [application key](https:\/\/developers.vtex.com\/docs\/guides\/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https:\/\/help.vtex.com\/en\/tutorial\/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:\r\n\r\n| **Product** | **Category** | **Resource** |\r\n| --------------- | ----------------- | ----------------- |\r\n| Checkout | CheckoutResources | **Shopping Cart Full Access** |\r\n\r\nYou can [create a custom role](https:\/\/help.vtex.com\/en\/tutorial\/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https:\/\/help.vtex.com\/en\/tutorial\/predefined-roles--jGDurZKJHvHJS13LnO7Dy):\r\n\r\n| **Role** | **Resource** | \r\n| --------------- | ----------------- | \r\n| Checkout Admin | Shopping Cart Full Access |\r\n\r\n>\u2757 Assigning a [predefined role](https:\/\/help.vtex.com\/en\/tutorial\/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https:\/\/help.vtex.com\/en\/tutorial\/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https:\/\/help.vtex.com\/en\/tutorial\/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm).\r\n\r\nTo learn more about machine authentication at VTEX, see [Authentication overview](https:\/\/developers.vtex.com\/docs\/guides\/authentication).",
+        "operationId": "GetClientProfileByEmail",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Content-Type"
+          },
+          {
+            "$ref": "#/components/parameters/Accept"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Client's email address to be searched.",
+            "required": true,
+            "style": "form",
+            "schema": {
+              "type": "string",
+              "example": "clark.kent@examplemail.com"
+            }
+          },
+          {
+            "name": "ensureComplete",
+            "in": "query",
+            "description": "Indicates whether the returned profiles must be complete or not.",
+            "required": false,
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "example": false
+            }
+          },
+          {
+            "$ref": "#/components/parameters/individualShippingEstimates"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userProfileId": {
+                      "type": "string",
+                      "description": "Unique ID associated with the customer profile."
+                    },
+                    "profileProvider": {
+                      "type": "string",
+                      "description": "Profile provider."
+                    },
+                    "availableAccounts": {
+                      "type": "array",
+                      "description": "Available accounts.",
+                      "items": {
+                        "type": "string",
+                        "description": "Account name."
+                      }
+                    },
+                    "availableAddresses": {
+                      "type": "array",
+                      "description": "Information on each available address.",
+                      "items": {
+                        "type": "object",
+                        "description": "Address information.",
+                        "properties": {
+                          "addressType": {
+                            "type": "string",
+                            "description": "Address type."
+                          },
+                          "receiverName": {
+                            "type": "string",
+                            "description": "Name of the receiver."
+                          },
+                          "addressId": {
+                            "type": "string",
+                            "description": "Address ID.",
+                            "nullable": true
+                          },
+                          "isDisposable": {
+                            "type": "boolean",
+                            "description": "Indicates whether address is disposable."
+                          },
+                          "city": {
+                            "type": "string",
+                            "description": "City of the address."
+                          },
+                          "state": {
+                            "type": "string",
+                            "description": "State of the address."
+                          },
+                          "country": {
+                            "type": "string",
+                            "description": "Country of the address. ISO three-letter code."
+                          },
+                          "street": {
+                            "type": "string",
+                            "description": "Street of the address."
+                          },
+                          "number": {
+                            "type": "string",
+                            "description": "Number of the address."
+                          },
+                          "neighborhood": {
+                            "type": "string",
+                            "description": "Neighborhood of the address."
+                          },
+                          "complement": {
+                            "type": "string",
+                            "description": "Complement to the address.",
+                            "nullable": true
+                          },
+                          "reference": {
+                            "type": "string",
+                            "description": "Reference that may help in the location of the address.",
+                            "nullable": true
+                          },
+                          "geoCoordinates": {
+                            "type": "array",
+                            "description": "Array containing two floats with geocoordinates, first longitude, then latitude.",
+                            "items": {
+                              "type": "number",
+                              "description": "Geocoordinates numbers."
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "userProfile": {
+                      "type": "object",
+                      "description": "Customer profile information.",
+                      "properties": {
+                        "email": {
+                          "type": "string",
+                          "description": "Email address.",
+                          "nullable": true
+                        },
+                        "firstName": {
+                          "type": "string",
+                          "description": "First name.",
+                          "nullable": true
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "description": "Last name."
+                        },
+                        "document": {
+                          "type": "string",
+                          "description": "Document."
+                        },
+                        "documentType": {
+                          "type": "string",
+                          "description": "Document type."
+                        },
+                        "phone": {
+                          "type": "string",
+                          "description": "Telephone number."
+                        },
+                        "corporateName": {
+                          "type": "string",
+                          "description": "Name of the company. Used for corporate clients.",
+                          "nullable": true
+                        },
+                        "tradeName": {
+                          "type": "string",
+                          "description": "Trade name. Used for corporate clients.",
+                          "nullable": true
+                        },
+                        "corporateDocument": {
+                          "type": "string",
+                          "description": "Document. Used for corporate clients.",
+                          "nullable": true
+                        },
+                        "stateInscription": {
+                          "type": "string",
+                          "description": "State inscription. Used for corporate clients.",
+                          "nullable": true
+                        },
+                        "corporatePhone": {
+                          "type": "string",
+                          "description": "Telephone number. Used for corporate clients.",
+                          "nullable": true
+                        },
+                        "isCorporate": {
+                          "type": "boolean",
+                          "description": "Indicates whether the client is corporate."
+                        },
+                        "profileCompleteOnLoading": {
+                          "type": "boolean",
+                          "description": "Profile complete when loading.",
+                          "nullable": true
+                        },
+                        "profileErrorOnLoading": {
+                          "type": "boolean",
+                          "description": "Profile error when loading.",
+                          "nullable": true
+                        },
+                        "customerClass": {
+                          "type": "string",
+                          "description": "Customer class.",
+                          "nullable": true
+                        }
+                      }
+                    },
+                    "isComplete": {
+                      "type": "boolean",
+                      "description": "Indicates whether customer profile is complete."
+                    }
+                  }
+                },
+                "example": {
+                  "userProfileId": "fb542e51-5488-4c34-8d17-ed8fcf597a94",
+                  "profileProvider": "VTEX",
+                  "availableAccounts": [],
+                  "availableAddresses": [
+                    {
+                      "addressType": "residential",
+                      "receiverName": "Clark Kent",
+                      "addressId": "666c2e830bd9474ab6f6cc53fb6dd2d2",
+                      "isDisposable": false,
+                      "postalCode": "12345-000",
+                      "city": "Metropolis",
+                      "state": "NY",
+                      "country": "USA",
+                      "street": "My street",
+                      "number": "123",
+                      "neighborhood": "My neighborhood",
+                      "complement": "Complement",
+                      "reference": "Reference",
+                      "geoCoordinates": [
+                        -47.924747467041016,
+                        -15.832582473754883
+                      ]
+                    }
+                  ],
+                  "userProfile": {
+                    "email": "clark.kent@example.com",
+                    "firstName": "Clark",
+                    "lastName": "Kent",
+                    "document": "12345678900",
+                    "documentType": "cpf",
+                    "phone": "+556199999999",
+                    "corporateName": "company-name",
+                    "tradeName": "trade-name",
+                    "corporateDocument": "12345678000100",
+                    "stateInscription": "12345678",
+                    "corporatePhone": "551100988887777",
+                    "isCorporate": false,
+                    "profileCompleteOnLoading": false,
+                    "profileErrorOnLoading": false,
+                    "customerClass": null
+                  },
+                  "isComplete": true
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
     }
   },
   "components": {

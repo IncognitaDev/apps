@@ -1834,6 +1834,190 @@ searchParams: {
 individualShippingEstimates?: boolean
 }
 }
+/**
+ * Retrieves a client's profile information by providing an email address.
+ * 
+ * If the response body fields are empty, the following situations may have occurred:
+ * 
+ * 1. There is no client registered with the email address provided in your store, or;
+ * 2. Client profile is invalid or incomplete. However, you can use the query parameter `ensureComplete=false` to get incomplete profiles. For more information, see [SmartCheckout - Customer information automatic fill-in](https://help.vtex.com/en/tutorial/smartcheckout-customer-information-automatic-fill-in--2Nuu3xAFzdhIzJIldAdtan).
+ * 
+ * >⚠️ The authentication of this endpoint can change depending on the customer context. If you are consulting information from a customer with a complete profile on the store, the response will return the customer's data masked. You can only access the customer data with an authenticated request.
+ * 
+ * ## Permissions
+ * 
+ * Any user or [application key](https://developers.vtex.com/docs/guides/api-authentication-using-application-keys) must have at least one of the appropriate [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3) to be able to successfully run this request. Otherwise they will receive a status code `403` error. These are the applicable resources for this endpoint:
+ * 
+ * | **Product** | **Category** | **Resource** |
+ * | --------------- | ----------------- | ----------------- |
+ * | Checkout | CheckoutResources | **Shopping Cart Full Access** |
+ * 
+ * You can [create a custom role](https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc#creating-a-role) with that resource or use one of the following [predefined roles](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy):
+ * 
+ * | **Role** | **Resource** | 
+ * | --------------- | ----------------- | 
+ * | Checkout Admin | Shopping Cart Full Access |
+ * 
+ * >❗ Assigning a [predefined role](https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy) to users or application keys usually grants permission to multiple [License Manager resources](https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3). If some of these permissions are not necessary, consider creating a custom role instead. For more information regarding security, see [Best practices for using application keys](https://help.vtex.com/en/tutorial/best-practices-application-keys--7b6nD1VMHa49aI5brlOvJm).
+ * 
+ * To learn more about machine authentication at VTEX, see [Authentication overview](https://developers.vtex.com/docs/guides/authentication).
+ */
+"GET /api/checkout/pub/profiles": {
+searchParams: {
+/**
+ * Client's email address to be searched.
+ */
+email: string
+/**
+ * Indicates whether the returned profiles must be complete or not.
+ */
+ensureComplete?: boolean
+/**
+ * Shows the product's estimated shipping date in the `shippingEstimate` field from the `orderForm`.
+ */
+individualShippingEstimates?: boolean
+}
+response: {
+/**
+ * Unique ID associated with the customer profile.
+ */
+userProfileId?: string
+/**
+ * Profile provider.
+ */
+profileProvider?: string
+/**
+ * Available accounts.
+ */
+availableAccounts?: string[]
+/**
+ * Information on each available address.
+ */
+availableAddresses?: {
+/**
+ * Address type.
+ */
+addressType?: string
+/**
+ * Name of the receiver.
+ */
+receiverName?: string
+/**
+ * Address ID.
+ */
+addressId?: (null | string)
+/**
+ * Indicates whether address is disposable.
+ */
+isDisposable?: boolean
+/**
+ * City of the address.
+ */
+city?: string
+/**
+ * State of the address.
+ */
+state?: string
+/**
+ * Country of the address. ISO three-letter code.
+ */
+country?: string
+/**
+ * Street of the address.
+ */
+street?: string
+/**
+ * Number of the address.
+ */
+number?: string
+/**
+ * Neighborhood of the address.
+ */
+neighborhood?: string
+/**
+ * Complement to the address.
+ */
+complement?: (null | string)
+/**
+ * Reference that may help in the location of the address.
+ */
+reference?: (null | string)
+/**
+ * Array containing two floats with geocoordinates, first longitude, then latitude.
+ */
+geoCoordinates?: number[]
+}[]
+/**
+ * Customer profile information.
+ */
+userProfile?: {
+/**
+ * Email address.
+ */
+email?: (null | string)
+/**
+ * First name.
+ */
+firstName?: (null | string)
+/**
+ * Last name.
+ */
+lastName?: string
+/**
+ * Document.
+ */
+document?: string
+/**
+ * Document type.
+ */
+documentType?: string
+/**
+ * Telephone number.
+ */
+phone?: string
+/**
+ * Name of the company. Used for corporate clients.
+ */
+corporateName?: (null | string)
+/**
+ * Trade name. Used for corporate clients.
+ */
+tradeName?: (null | string)
+/**
+ * Document. Used for corporate clients.
+ */
+corporateDocument?: (null | string)
+/**
+ * State inscription. Used for corporate clients.
+ */
+stateInscription?: (null | string)
+/**
+ * Telephone number. Used for corporate clients.
+ */
+corporatePhone?: (null | string)
+/**
+ * Indicates whether the client is corporate.
+ */
+isCorporate?: boolean
+/**
+ * Profile complete when loading.
+ */
+profileCompleteOnLoading?: (null | boolean)
+/**
+ * Profile error when loading.
+ */
+profileErrorOnLoading?: (null | boolean)
+/**
+ * Customer class.
+ */
+customerClass?: (null | string)
+}
+/**
+ * Indicates whether customer profile is complete.
+ */
+isComplete?: boolean
+}
+}
 }
 /**
  * Request body.

@@ -21,26 +21,28 @@ interface Props {
 export default async function loader(
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Place[]> {
   const { geoCoordinates, postalCode, countryCode } = props;
-  const { vcs } = ctx;
+  const { my } = ctx;
 
   const _props = geoCoordinates
     ? { geoCoordinates }
     : { postalCode, countryCode };
 
-  const pickupPoints = await vcs
-    ["GET /api/checkout/pub/pickup-points"](_props)
-    .then((r) => r.json()) as {
-      paging: { page: number; pageSize: number; total: number; pages: number };
-      items: { distance: number; pickupPoint: PickupPoint }[];
-    };
+  const pickupPoints = (await my["GET /api/checkout/pub/pickup-points"](
+    _props
+  ).then((r) => r.json())) as {
+    paging: { page: number; pageSize: number; total: number; pages: number };
+    items: { distance: number; pickupPoint: PickupPoint }[];
+  };
 
-  return pickupPoints.items?.map(({ distance, pickupPoint }) =>
-    toPlace({
-      distance,
-      ...pickupPoint,
-    })
-  ) ?? [];
+  return (
+    pickupPoints.items?.map(({ distance, pickupPoint }) =>
+      toPlace({
+        distance,
+        ...pickupPoint,
+      })
+    ) ?? []
+  );
 }

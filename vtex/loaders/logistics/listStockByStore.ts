@@ -11,18 +11,18 @@ interface Props {
 export default async function loader(
   props: Props,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<ProductBalance[]> {
   const { skuId } = props;
-  const { vcs } = ctx;
+  const { my } = ctx;
 
   try {
-    const stockByStore = await vcs
-      ["GET /api/logistics/pvt/inventory/skus/:skuId"]({ skuId })
-      .then((r) => r.json()) as {
-        skuId?: string;
-        balance?: ProductBalance[];
-      };
+    const stockByStore = (await my[
+      "GET /api/logistics/pvt/inventory/skus/:skuId"
+    ]({ skuId }).then((r) => r.json())) as {
+      skuId?: string;
+      balance?: ProductBalance[];
+    };
 
     return stockByStore.balance || [];
   } catch (error) {

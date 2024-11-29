@@ -24,6 +24,21 @@ export default async function loader(
     { body: orderForm }
   );
 
+  // const placeOrderResponse = await my[
+  //   "POST /api/checkout/pub/orderform/:orderFormId/transaction"
+  // ](
+  //   { orderFormId: orderForm.orderFormId },
+  //   {
+  //     body: {
+  //       referenceId: orderForm.orderFormId,
+  //       value: orderForm.value,
+  //       referenceValue: orderForm.value,
+  //       savePersonalData: true,
+  //       optinNewsLetter: orderForm.optinNewsLetter,
+  //     },
+  //   }
+  // );
+
   const placeOrder = await placeOrderResponse.json();
   const placeOrderHeaders = placeOrderResponse.headers;
 
@@ -34,7 +49,7 @@ export default async function loader(
 
   const cardInfos = [
     {
-      paymentSystem: 4,
+      paymentSystem: 2,
       installments: 1,
       currencyCode: "BRL",
       value:
@@ -57,6 +72,8 @@ export default async function loader(
       },
     },
   ];
+
+  console.log("cardInfos", placeOrder.transactionData);
 
   await vp["POST /api/pub/transactions/:transactionId/payments"](
     {

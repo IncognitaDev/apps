@@ -18,7 +18,7 @@ const loader = (_props: unknown, _req: Request, ctx: AppContext): Config => ({
   sp: ctx.sp,
   io: ctx.io,
   my: ctx.my,
-  vcs: ctx.vcs,
+  vcs: ctx.my,
   api: ctx.api,
 });
 

@@ -5,13 +5,13 @@ import { toPlace } from "../../utils/transform.ts";
 export default async function loader(
   _props: unknown,
   _req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Place[]> {
-  const { vcs } = ctx;
+  const { my } = ctx;
 
-  const pickupPoints = await vcs
-    ["GET /api/logistics/pvt/configuration/pickuppoints"]({})
-    .then((r) => r.json());
+  const pickupPoints = await my[
+    "GET /api/logistics/pvt/configuration/pickuppoints"
+  ]({}).then((r) => r.json());
 
   return pickupPoints.map(toPlace);
 }

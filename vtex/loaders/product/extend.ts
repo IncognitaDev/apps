@@ -21,10 +21,7 @@ export interface Props {
   products: Product[];
 }
 
-const brandsExt = async (
-  products: Product[],
-  ctx: AppContext,
-) => {
+const brandsExt = async (products: Product[], ctx: AppContext) => {
   const brands = await ctx.invoke.vtex.loaders.legacy.brands();
 
   if (!brands || !brands.length) {
@@ -37,16 +34,13 @@ const brandsExt = async (
   }));
 };
 
-const similarsExt = (
-  products: Product[],
-  req: Request,
-  ctx: AppContext,
-) => Promise.all(products.map((p) => withIsSimilarTo(req, ctx, p)));
+const similarsExt = (products: Product[], req: Request, ctx: AppContext) =>
+  Promise.all(products.map((p) => withIsSimilarTo(req, ctx, p)));
 
 const kitItemsExt = async (
   products: Product[],
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[]> => {
   const productIDs = new Set<string>();
 
@@ -59,7 +53,7 @@ const kitItemsExt = async (
   const batched = await Promise.all(
     batch(productIDs.values(), 10).map((batch) =>
       listLoader({ props: { ids: batch } }, req, ctx)
-    ),
+    )
   );
 
   const productsById = new Map<string, ProductLeaf>();
@@ -82,7 +76,7 @@ const kitItemsExt = async (
 const variantsExt = async (
   products: Product[],
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[]> => {
   const productIDs = new Set<string>();
 
@@ -93,7 +87,7 @@ const variantsExt = async (
   const batched = await Promise.all(
     batch(productIDs.values(), 15).map((batch) =>
       listLoader({ props: { ids: batch } }, req, ctx)
-    ),
+    )
   );
 
   const productsById = new Map<string, Product>();
@@ -114,7 +108,7 @@ const variantsExt = async (
 
 const reviewsExt = async (
   products: Product[],
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[]> => {
   const reviewPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
@@ -124,14 +118,16 @@ const reviewsExt = async (
       to: "10",
       order_by: "",
       status: true,
-    }).then((res) => res.json())
+    })
+      .then((res) => res.json())
       .catch(() => ({}))
   );
 
   const ratingPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/rating/:inProductGroupWithId"]({
       inProductGroupWithId: product.inProductGroupWithID ?? "",
-    }).then((res) => res.json())
+    })
+      .then((res) => res.json())
       .catch(() => ({}))
   );
 
@@ -148,20 +144,19 @@ const reviewsExt = async (
 
 const inventoryExt = async (
   products: Product[],
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[]> => {
   const inventoriesPromises = products.map((product) =>
-    ctx.vcs["GET /api/logistics/pvt/inventory/skus/:skuId"]({
+    ctx.my["GET /api/logistics/pvt/inventory/skus/:skuId"]({
       skuId: product.inProductGroupWithID ?? "",
-    }).then((res) => res.json())
+    })
+      .then((res) => res.json())
       .catch(() => ({}))
   );
 
   const inventoriesPromise = Promise.all(inventoriesPromises);
 
-  const [inventories] = await Promise.all([
-    inventoriesPromise,
-  ]);
+  const [inventories] = await Promise.all([inventoriesPromise]);
 
   return toInventories(products, inventories);
 };
@@ -180,7 +175,7 @@ export default async (
     brands,
   }: Props,
   req: Request,
-  ctx: AppContext,
+  ctx: AppContext
 ): Promise<Product[]> => {
   let p = products.filter((p) => p);
 
