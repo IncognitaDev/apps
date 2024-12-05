@@ -14,7 +14,7 @@ export interface Props {
 const action = async (
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
   /* no-explicit-any */
 ): Promise<CreateNewDocument> => {
   const { my, vcsDeprecated } = ctx;
@@ -30,14 +30,15 @@ const action = async (
     },
   };
 
-  const response = await (isPrivateEntity
-    ? my[`POST /api/dataentities/:acronym/documents`](
+  const response =
+    await (isPrivateEntity
+      ? my[`POST /api/dataentities/:acronym/documents`](
         { acronym },
-        requestOptions
+        requestOptions,
       )
-    : vcsDeprecated[`POST /api/dataentities/:acronym/documents`](
+      : vcsDeprecated[`POST /api/dataentities/:acronym/documents`](
         { acronym },
-        requestOptions
+        requestOptions,
       ));
 
   return response.json();

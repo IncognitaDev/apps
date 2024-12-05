@@ -15,7 +15,7 @@ const doSimulate = (
     quantity: number;
     seller: string | undefined;
   }[],
-  ctx: AppContext
+  ctx: AppContext,
 ) => {
   const {
     payload: {
@@ -34,8 +34,9 @@ const doSimulate = (
   utm_source && md.set("utmSource", utm_source);
   utmi_campaign && md.set("utmiCampaign", utmi_campaign);
   campaigns && md.set("campaigns", [{ id: campaigns }]);
-  const marketingData =
-    md.size > 0 ? Object.fromEntries(md.entries()) : undefined;
+  const marketingData = md.size > 0
+    ? Object.fromEntries(md.entries())
+    : undefined;
 
   const body = {
     items,
@@ -58,24 +59,23 @@ export const extension = async (products: Product[], ctx: AppContext) => {
     return products;
   }
 
-  const items =
-    products?.flatMap(
-      (p) =>
-        p.isVariantOf?.hasVariant.flatMap(
-          (v) =>
-            v.offers?.offers.map((o) => ({
-              id: v.productID,
-              quantity: 1,
-              seller: o.seller,
-            })) ?? []
-        ) ?? []
-    ) ?? [];
+  const items = products?.flatMap(
+    (p) =>
+      p.isVariantOf?.hasVariant.flatMap(
+        (v) =>
+          v.offers?.offers.map((o) => ({
+            id: v.productID,
+            quantity: 1,
+            seller: o.seller,
+          })) ?? [],
+      ) ?? [],
+  ) ?? [];
 
   // VTEX API limits to 300 simulations
   const batched = batch(items, 300);
 
   const responses = await Promise.all(
-    batched.map((batch) => doSimulate(batch, ctx))
+    batched.map((batch) => doSimulate(batch, ctx)),
   );
 
   const mapped = new Map<string, Map<string, Item>>();

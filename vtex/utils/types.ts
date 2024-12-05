@@ -263,12 +263,35 @@ export interface PaymentData {
   updateStatus: string;
   installmentOptions: InstallmentOption[];
   paymentSystems: PaymentSystem[];
-  payments: unknown[];
+  payments: Payment[];
   giftCards: unknown[];
   giftCardMessages: unknown[];
-  availableAccounts: unknown[];
+  availableAccounts: AvailableAccount[];
   availableTokens: unknown[];
   availableAssociations: AvailableAssociations;
+}
+
+export interface AvailableAccount {
+  accountId: string;
+  paymentSystem: string;
+  paymentSystemName: string;
+  cardNumber: string;
+  bin: string;
+  availableAddresses: string[];
+  isExpired: boolean;
+  accountStatus: string | null;
+}
+
+export interface Payment {
+  accountId: string;
+  paymentSystem: string;
+  bin: string | null;
+  paymentName: string | null;
+  paymentGroupName: string | null;
+  value: number;
+  installments: null;
+  tokenId: null;
+  referenceValue: number;
 }
 
 export interface InstallmentOption {

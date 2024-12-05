@@ -43,7 +43,7 @@ interface Props {
 export default async function loader(
   props: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Document[]> {
   const { my } = ctx;
   const { acronym, fields, where, sort, skip = 0, take = 10 } = props;
@@ -64,7 +64,7 @@ export default async function loader(
         cookie,
         "REST-Range": `resources=${limits.from}-${limits.to}`,
       },
-    }
+    },
   ).then((response) => response.json());
 
   return documents;

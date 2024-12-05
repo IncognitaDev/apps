@@ -18,7 +18,7 @@ const loader = async (props: Props, req: Request, ctx: AppContext) => {
     "GET /api/checkout/pub/postal-code/:countryCode/:postalCode"
   ](
     { postalCode: props.postalCode, countryCode: props.countryCode ?? "BRA" },
-    { headers: { cookie } }
+    { headers: { cookie } },
   );
 
   const result = await response.json();

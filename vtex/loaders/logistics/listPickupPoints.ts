@@ -5,7 +5,7 @@ import { toPlace } from "../../utils/transform.ts";
 export default async function loader(
   _props: unknown,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Place[]> {
   const { my } = ctx;
 

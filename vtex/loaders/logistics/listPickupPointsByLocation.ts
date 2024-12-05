@@ -21,7 +21,7 @@ interface Props {
 export default async function loader(
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Place[]> {
   const { geoCoordinates, postalCode, countryCode } = props;
   const { my } = ctx;
@@ -31,7 +31,7 @@ export default async function loader(
     : { postalCode, countryCode };
 
   const pickupPoints = (await my["GET /api/checkout/pub/pickup-points"](
-    _props
+    _props,
   ).then((r) => r.json())) as {
     paging: { page: number; pageSize: number; total: number; pages: number };
     items: { distance: number; pickupPoint: PickupPoint }[];

@@ -97,12 +97,12 @@ export default function VTEX({
   appKey &&
     headers.set(
       "X-VTEX-API-AppKey",
-      typeof appKey === "string" ? appKey : appKey?.get?.() ?? ""
+      typeof appKey === "string" ? appKey : appKey?.get?.() ?? "",
     );
   appToken &&
     headers.set(
       "X-VTEX-API-AppToken",
-      typeof appToken === "string" ? appToken : appToken?.get?.() ?? ""
+      typeof appToken === "string" ? appToken : appToken?.get?.() ?? "",
     );
   const sp = createHttpClient<SP>({
     base: `https://sp.vtex.com`,
@@ -121,7 +121,8 @@ export default function VTEX({
     fetcher: fetchSafe,
   });
   const io = createGraphqlClient({
-    endpoint: `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
+    endpoint:
+      `https://${account}.vtexcommercestable.com.br/api/io/_v/private/graphql/v1`,
     processHeaders: removeDirtyCookies,
     fetcher: fetchSafe,
   });
@@ -168,7 +169,7 @@ export default function VTEX({
 }
 export const preview = async (props: AppRuntime) => {
   const markdownContent = await Markdown(
-    new URL("./README.md", import.meta.url).href
+    new URL("./README.md", import.meta.url).href,
   );
   return {
     Component: PreviewVtex,

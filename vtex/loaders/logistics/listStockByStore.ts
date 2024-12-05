@@ -11,7 +11,7 @@ interface Props {
 export default async function loader(
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<ProductBalance[]> {
   const { skuId } = props;
   const { my } = ctx;

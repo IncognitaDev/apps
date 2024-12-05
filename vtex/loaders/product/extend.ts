@@ -40,7 +40,7 @@ const similarsExt = (products: Product[], req: Request, ctx: AppContext) =>
 const kitItemsExt = async (
   products: Product[],
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
   const productIDs = new Set<string>();
 
@@ -53,7 +53,7 @@ const kitItemsExt = async (
   const batched = await Promise.all(
     batch(productIDs.values(), 10).map((batch) =>
       listLoader({ props: { ids: batch } }, req, ctx)
-    )
+    ),
   );
 
   const productsById = new Map<string, ProductLeaf>();
@@ -76,7 +76,7 @@ const kitItemsExt = async (
 const variantsExt = async (
   products: Product[],
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
   const productIDs = new Set<string>();
 
@@ -87,7 +87,7 @@ const variantsExt = async (
   const batched = await Promise.all(
     batch(productIDs.values(), 15).map((batch) =>
       listLoader({ props: { ids: batch } }, req, ctx)
-    )
+    ),
   );
 
   const productsById = new Map<string, Product>();
@@ -108,7 +108,7 @@ const variantsExt = async (
 
 const reviewsExt = async (
   products: Product[],
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
   const reviewPromises = products.map((product) =>
     ctx.my["GET /reviews-and-ratings/api/reviews"]({
@@ -144,7 +144,7 @@ const reviewsExt = async (
 
 const inventoryExt = async (
   products: Product[],
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
   const inventoriesPromises = products.map((product) =>
     ctx.my["GET /api/logistics/pvt/inventory/skus/:skuId"]({
@@ -175,7 +175,7 @@ export default async (
     brands,
   }: Props,
   req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product[]> => {
   let p = products.filter((p) => p);
 

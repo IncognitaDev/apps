@@ -24,7 +24,7 @@ export type Props = {
 const loader = async (
   props: Props,
   _req: Request,
-  ctx: AppContext
+  ctx: AppContext,
 ): Promise<Product | null> => {
   const { my } = ctx;
   const sc = 1;
@@ -54,7 +54,7 @@ const loader = async (
         },
         {
           body: { items: [{ id: `${sku.Id}`, seller: SellerId, quantity: 1 }] },
-        }
+        },
       ).then((res) => res.json())
     ),
   ]);
@@ -67,16 +67,16 @@ const loader = async (
   const additionalProperty = [
     sku.AlternateIds.RefId
       ? toAdditionalPropertyReferenceId({
-          name: "RefId",
-          value: sku.AlternateIds.RefId,
-        })
+        name: "RefId",
+        value: sku.AlternateIds.RefId,
+      })
       : null,
     ...Object.entries(sku.ProductCategories ?? {}).map(([propertyID, value]) =>
       toAdditionalPropertyCategory({ propertyID, value })
     ),
     ...Object.entries(sku.ProductClusterNames ?? {}).map(
       ([propertyID, value]) =>
-        toAdditionalPropertyCluster({ propertyID, value })
+        toAdditionalPropertyCluster({ propertyID, value }),
     ),
     ...sku.SkuSpecifications.flatMap((spec) =>
       spec.FieldValues.map((value, it) =>
@@ -92,7 +92,7 @@ const loader = async (
         "@type": "PropertyValue",
         name: "salesChannel",
         propertyID: channel.toString(),
-      })
+      }),
     ),
   ].filter((p): p is PropertyValue => Boolean(p));
 
@@ -127,10 +127,9 @@ const loader = async (
           seller: seller,
           priceValidUntil: priceValidUntil,
           inventoryLevel: {}, // TODO: Could not find this info anywhere
-          availability:
-            availability === "available"
-              ? "https://schema.org/InStock"
-              : "https://schema.org/OutOfStock",
+          availability: availability === "available"
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
           priceSpecification: [
             {
               "@type": "UnitPriceSpecification",
@@ -153,8 +152,8 @@ const loader = async (
                     billingDuration: i.count,
                     billingIncrement: i.value / 100,
                     price: i.total / 100,
-                  })
-                )
+                  }),
+                ),
             ) ?? []),
           ],
         };
@@ -180,14 +179,13 @@ const loader = async (
     isVariantOf: {
       "@type": "ProductGroup",
       url: sku.DetailUrl,
-      hasVariant:
-        skus
-          ?.filter((x) => x.IsActive)
-          .map(({ Id }) => ({
-            "@type": "Product",
-            productID: `${Id}`,
-            sku: `${Id}`,
-          })) ?? [],
+      hasVariant: skus
+        ?.filter((x) => x.IsActive)
+        .map(({ Id }) => ({
+          "@type": "Product",
+          productID: `${Id}`,
+          sku: `${Id}`,
+        })) ?? [],
       additionalProperty: groupAdditionalProperty,
       productGroupID,
       name: sku.ProductName,

@@ -17,7 +17,7 @@ const loader = async (props: Props, req: Request, ctx: AppContext) => {
 
   const response = await my["GET /api/checkout/pub/profiles"](
     { sc: segment?.payload?.channel, email: props.email },
-    { headers: { cookie } }
+    { headers: { cookie } },
   );
 
   const result = await response.json();
