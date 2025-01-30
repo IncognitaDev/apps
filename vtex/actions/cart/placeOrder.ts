@@ -19,9 +19,25 @@ export default async function loader(
   const orderForm = await ctx.invoke.vtex.loaders.cart();
   console.log("pos orderForm");
 
-  const placeOrderResponse = await my["PUT /api/checkout/pub/orders"](
-    {},
-    { body: orderForm },
+  // const placeOrderResponse = await my["PUT /api/checkout/pub/orders"](
+  //   {},
+  //   { body: orderForm },
+  // );
+
+  const placeOrderResponse = await my[
+    "POST /api/checkout/pub/orderForm/:orderFormId/transaction"
+  ](
+    { orderFormId: orderForm.orderFormId },
+    {
+      body: {
+        referenceId: orderForm.orderFormId,
+        savePersonalData: false,
+        optinNewsLetter: false,
+        value: orderForm.value,
+        referenceValue: orderForm.value,
+        interestValue: 0,
+      },
+    },
   );
 
   // const placeOrderResponse = await my[
@@ -42,6 +58,8 @@ export default async function loader(
   const placeOrder = await placeOrderResponse.json();
   const placeOrderHeaders = placeOrderResponse.headers;
 
+  Deno.writeTextFileSync("./teste.json", JSON.stringify(placeOrder));
+
   console.log("pos placeOrder", placeOrder);
 
   const cookies = placeOrderHeaders.get("set-cookie");
@@ -49,26 +67,22 @@ export default async function loader(
 
   const cardInfos = [
     {
-      paymentSystem: 2,
+      paymentSystem: placeOrder.merchantTransactions?.[0]?.payments[0]
+        .paymentSystem,
       installments: 1,
       currencyCode: "BRL",
-      value: placeOrder.transactionData?.merchantTransactions?.[0]?.payments
-        ?.[0]
-        .value,
+      value: placeOrder.merchantTransactions?.[0]?.payments?.[0].value,
       installmentsInterestRate: 0,
       installmentsValue: 0,
-      referenceValue: placeOrder.transactionData?.merchantTransactions?.[0]
-        ?.payments?.[0]
+      referenceValue: placeOrder.merchantTransactions?.[0]?.payments?.[0]
         .referenceValue,
       fields: {
         ...props,
         addressId: placeOrder.orders?.[0]?.shippingData?.address?.addressId,
       },
       transaction: {
-        id: placeOrder.transactionData?.merchantTransactions?.[0]
-          ?.transactionId,
-        merchantName: placeOrder.transactionData?.merchantTransactions?.[0]
-          ?.merchantName,
+        id: placeOrder.merchantTransactions?.[0]?.transactionId,
+        merchantName: placeOrder.merchantTransactions?.[0]?.merchantName,
       },
     },
   ];
@@ -77,9 +91,8 @@ export default async function loader(
 
   await vp["POST /api/pub/transactions/:transactionId/payments"](
     {
-      transactionId: placeOrder.transactionData?.merchantTransactions?.[0]
-        ?.transactionId,
-      orderId: placeOrder.orders?.[0]?.orderGroup,
+      transactionId: placeOrder?.merchantTransactions?.[0]?.transactionId,
+      orderId: placeOrder.orderGroup,
     },
     {
       headers: {
@@ -93,7 +106,7 @@ export default async function loader(
   console.log("pos sendPaymentResponse");
 
   await my["POST /api/checkout/pub/gatewayCallback/:orderGroup"](
-    { orderGroup: placeOrder.orders?.[0]?.orderGroup },
+    { orderGroup: placeOrder.orderGroup },
     { headers: { Cookie: cookies } },
   );
 
