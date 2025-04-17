@@ -1,3 +1,4 @@
+import { HttpError } from "std/http/mod.ts";
 import { AppContext } from "../../mod.ts";
 
 export interface Props {
@@ -58,8 +59,6 @@ export default async function loader(
   const placeOrder = await placeOrderResponse.json();
   const placeOrderHeaders = placeOrderResponse.headers;
 
-  Deno.writeTextFileSync("./teste.json", JSON.stringify(placeOrder));
-
   console.log("pos placeOrder", placeOrder);
 
   const cookies = placeOrderHeaders.get("set-cookie");
@@ -87,9 +86,9 @@ export default async function loader(
     },
   ];
 
-  console.log("cardInfos", placeOrder.transactionData);
+  // console.log("cardInfos", placeOrder.transactionData);
 
-  await vp["POST /api/pub/transactions/:transactionId/payments"](
+  const res = await vp["POST /api/pub/transactions/:transactionId/payments"](
     {
       transactionId: placeOrder?.merchantTransactions?.[0]?.transactionId,
       orderId: placeOrder.orderGroup,
@@ -101,14 +100,41 @@ export default async function loader(
       },
       body: JSON.stringify(cardInfos),
     },
-  );
+  ).then((res) => {
+    console.log("Then", res.status);
+    return res;
+  }).catch((err) => {
+    console.log("Catch", err);
+    return err;
+  });
+
+  console.log("res", res.json());
 
   console.log("pos sendPaymentResponse");
 
-  await my["POST /api/checkout/pub/gatewayCallback/:orderGroup"](
-    { orderGroup: placeOrder.orderGroup },
-    { headers: { Cookie: cookies } },
-  );
+  const finalResponse = await my
+    ["POST /api/checkout/pub/gatewayCallback/:orderGroup"](
+      { orderGroup: placeOrder.orderGroup },
+      { headers: { Cookie: cookies } },
+    ).then((res) => {
+      console.log("Then orderGroup", res.status);
+      return res;
+    }).catch((err: HttpError) => {
+      console.log("Catch orderGroup", err.message);
+      try {
+        const json = JSON.parse(err.message);
+        if (json.RedirectResponseCollection) {
+          return json;
+        }
+      } catch (e) {
+      }
+
+      return err;
+    });
+
+  if (finalResponse?.RedirectResponseCollection) {
+    return finalResponse;
+  }
 
   console.log("pos finalResponse");
 
